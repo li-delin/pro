@@ -1,0 +1,72 @@
+server:
+  port: 9001
+  servlet:
+    context-path: /yhzx
+
+spring:
+  application:
+    name: yhzx
+
+  redis:
+    database: 0
+    timeout: 3000 #超时时间3秒
+    password: 123456789
+    #################################哨兵模式
+    #host: 192.168.100.129
+    #port: 6379
+    #password: 123456789
+    #sentinel:
+      #主服务器所在集群名称
+      #master: mymaster
+      #nodes: 192.168.100.129:26379,192.168.100.129:26380,192.168.100.129:26381
+    cluster:
+      nodes:
+        - 192.168.100.129:8001
+        - 192.168.100.129:8004
+        - 192.168.100.130:8005
+        - 192.168.100.130:8002
+        - 192.168.100.131:8003
+        - 192.168.100.131:8006
+    lettuce:
+      pool:
+        #连接池最大连接数(使用负数表示没有限制) 默认8
+        max-active: 8
+        #连接池最大阻塞等待时间(使用负数表示没有限制)
+        max-wait: 1000
+        #连接池中的最大空闲连接默认8
+        max-idle: 8
+        #连接池中的最小空闲连接
+        min-idle: 0
+  cache:
+    type: redis
+
+eureka:
+  instance:
+    #以ip形式注册
+    prefer-ip-address: true
+    #客户端向服务端发送心跳的间隔
+    lease-renewal-interval-in-seconds: 5
+    #实例超时时间
+    lease-expiration-duration-in-seconds: 10
+    #注册到eureka上的唯一实例ID
+    instance-id: ${spring.cloud.client.ip-address}:${server.port}
+    #实例元数据，供其他实例使用
+    metadata-map:
+      configPath: ${server.servlet.context-path:}
+      management.context-path: ${server.servlet.context-path:}/actuator
+      version: 1.0
+    #实例主页绝对url
+    #home-page-url-path: ${server.servlet.context-path:}
+    #实例健康检查相对url
+    #health-check-url-path: ${server.servlet.context-path:}/actuator/health
+    #实例状态页绝对url
+    #status-page-url-path: ${server.servlet.context-path:}/swagger-ui.html
+  client:
+    #从eureka-server获取注册表
+    fetch-registry: true
+    #注册到eureka
+    register-with-eureka: true
+    service-url:
+      defauleZone: http://localhost/eureka
+    #定时从eureka serve拉取服务注册信息的间隔时间
+    registry-fetch-interval-seconds: 5
