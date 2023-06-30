@@ -1,10 +1,10 @@
-package com.pro.cloud.cahce;
+package com.pro.cloud.cache;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class CahceApplicationTests {
+class CacheApplicationTests {
 
     @Test
     void contextLoads() {

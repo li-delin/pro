@@ -1,5 +1,7 @@
 package com.pro.cloud.service;
 
+import com.pro.cloud.cache.config.CacheManagerNames;
+import com.pro.cloud.cache.util.RedisTemplateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -16,6 +18,9 @@ public class UserService {
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
+    @Autowired
+    private RedisTemplateUtil redisTemplateUtil;
+
     private Map<String, Object> DATABASE = new HashMap<String, Object>(){{
         put("k1",12345);
         put("k2",67890);
@@ -24,12 +29,14 @@ public class UserService {
         put("k5","zxcvbn");
     }};
 
-//    @Cacheable(cacheManager = "cacheManager",cacheNames = "GET_USER",sync = true)
+//    @Cacheable(cacheManager = CacheManagerNames.REDIS_CACHE_MANAGER,cacheNames = "GET_USER",sync = true)
     public Object get(String p1,String p2){
-        redisTemplate.opsForValue().set("p3","12345");
+        /*redisTemplate.opsForValue().set("p3","12345");
         System.out.println("11");
-        System.out.println(redisTemplate.opsForValue().get("p3"));
-        return DATABASE.get("k1");
+        System.out.println(redisTemplate.opsForValue().get("p3"));*/
+        redisTemplateUtil.set("dl","augdl");
+        return redisTemplateUtil.get("dl");
     }
+
 
 }

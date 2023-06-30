@@ -1,13 +1,13 @@
-package com.pro.cloud.cahce;
+package com.pro.cloud.cache;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CahceApplication {
+public class CacheApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(CahceApplication.class, args);
+        SpringApplication.run(CacheApplication.class, args);
     }
 
 }
