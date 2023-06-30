@@ -50,12 +50,6 @@
             <version>${spring-boot-redis.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.pro.cloud</groupId>
-            <artifactId>cache</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-
 
     </dependencies>
 

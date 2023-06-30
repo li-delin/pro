@@ -38,6 +38,12 @@
             <version>2.7.3</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.pro.cloud</groupId>
+            <artifactId>cache</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
     </dependencies>
 
     <build>
