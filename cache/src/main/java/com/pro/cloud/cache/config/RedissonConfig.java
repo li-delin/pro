@@ -2,15 +2,12 @@ package com.pro.cloud.cache.config;
 
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
+import org.redisson.config.ClusterServersConfig;
 import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @Author lenovo
@@ -18,7 +15,7 @@ import java.util.stream.Collectors;
  * @Des
  */
 @Configuration
-public class RedissionConfig {
+public class RedissonConfig {
 
     @Autowired
     private RedisClusterNodesProperties clusterNodesProperties;
@@ -29,12 +26,11 @@ public class RedissionConfig {
     @Bean
     public RedissonClient redissonClient() {
         Config config = new Config();
-        config.useClusterServers()
-                .addNodeAddress(clusterNodesProperties.getNodes()
-                        .stream()
-                        .map(s -> "redis://"+s)
-                        .collect(Collectors.joining(",")))
-                .setPassword(password);
+        ClusterServersConfig serversConfig = config.useClusterServers();
+        serversConfig.setPassword(password);
+        for (String node : clusterNodesProperties.getNodes()) {
+            serversConfig.addNodeAddress("redis://" + node);
+        }
         return Redisson.create(config);
     }
 

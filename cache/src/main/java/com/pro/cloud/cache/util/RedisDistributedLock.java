@@ -1,5 +1,7 @@
 package com.pro.cloud.cache.util;
 
+import lombok.Data;
+import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import java.util.concurrent.TimeUnit;
  * @Date 2023/6/30
  * @Des 分布式锁
  */
+@Data
 public class RedisDistributedLock {
 
 
@@ -22,20 +25,23 @@ public class RedisDistributedLock {
 
     private RedisTemplate<String, Object> redisTemplate;
 
+    private RedissonClient redissonClient;
+
     /**
-     * 无过期时间的加锁
+     * 构造
      *
      * @param redisTemplate
      */
-    public RedisDistributedLock(RedisTemplate<String, Object> redisTemplate) {
+    public RedisDistributedLock(RedisTemplate<String, Object> redisTemplate, RedissonClient redissonClient) {
         this.redisTemplate = redisTemplate;
+        this.redissonClient = redissonClient;
     }
 
 
     /**
      * 无过期时间的加锁方法  true成功 false失败
      *
-     * @param lockKey lockKey
+     * @param lockKey   lockKey
      * @param lockValue lockValue
      * @return boolean
      */
@@ -59,6 +65,7 @@ public class RedisDistributedLock {
     /**
      * 调用redisTemplate方法删除key
      * 不是原子执行
+     *
      * @param lockKey
      */
     public void deleteKey(String lockKey) {
@@ -71,12 +78,52 @@ public class RedisDistributedLock {
      * 如果相等则说明当前线程持有锁，可以通过redis.call('del', KEYS[1])命令删除锁。如果不相等，则说明当前线程没有持有锁，返回0表示释放锁失败。
      * KEYS[1]表示锁的键名，ARGV[1]表示锁的值。通过比较锁的当前值和预期值，可以确保只有持有锁的线程才能释放锁，防止误释放其他线程持有的锁。
      * 保证了原子性
+     *
      * @param lockKey
      * @param lockValue
      */
     public void releaseLock(String lockKey, String lockValue) {
         RedisScript<Long> script = new DefaultRedisScript<>("if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end", Long.class);
         redisTemplate.execute(script, Collections.singletonList(lockKey), lockValue);
+    }
+
+    /**
+     * redisson无过期时间加锁
+     *
+     * @param lockKey
+     */
+    public void acquireLockByRedisson(String lockKey) {
+        redissonClient.getLock(lockKey).lock();
+    }
+
+    /**
+     * redisson过期时间加锁
+     *
+     * @param lockKey
+     * @param timeout
+     * @param timeUnit
+     */
+    public void acquireLockByRedisson(String lockKey, long timeout, TimeUnit timeUnit) {
+        redissonClient.getLock(lockKey).lock(timeout, timeUnit);
+    }
+
+    /**
+     * 校验是否加锁
+     *
+     * @param lockKey
+     * @return
+     */
+    public boolean ifLockByRedisson(String lockKey) {
+        return redissonClient.getLock(lockKey).isLocked();
+    }
+
+    /**
+     * 释放锁
+     *
+     * @param lockKey
+     */
+    public void unlockByRedisson(String lockKey) {
+        redissonClient.getLock(lockKey).unlock();
     }
 
 
